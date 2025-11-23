@@ -85,7 +85,7 @@ export type TANMAY_TYPE = {
   };
 };
 
-export const TANMAY: TANMAY_TYPE = {
+const TANMAY: TANMAY_TYPE = {
   // Personal Information
   personal: {
     name: "Tanmay Kumar",
