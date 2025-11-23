@@ -7,8 +7,8 @@ import {
   TransformComponent,
   TransformWrapper,
 } from "react-zoom-pan-pinch";
-import ContainedPdfViewer from "../../../../dump/pdf-viewer";
-import Wrapper from "../../../../dump/wrapper";
+import ContainedPdfViewer from "./pdf-viewer";
+import Wrapper from "./wrapper";
 
 const ResumeViewer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
