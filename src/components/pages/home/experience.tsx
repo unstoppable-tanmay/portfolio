@@ -1,99 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { TANMAY_TYPE } from "@/app/page";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
-interface ExperienceItem {
-  id: number;
-  company: string;
-  logo: string;
-  role: string;
-  duration: string;
-  period: string;
-  description: string[];
-  technologies: string[];
-  achievements?: string[];
-  link?: string;
+interface ExperienceProps {
+  data: TANMAY_TYPE["experience"];
 }
 
-const EXPERIENCES: ExperienceItem[] = [
-  {
-    id: 1,
-    company: "Papaya Global",
-    logo: "/images/companies/papaya.png",
-    role: "SDE 1",
-    duration: "1 year 4 months",
-    period: "Aug 2024 - Present",
-    description: [
-      "Built MCP Agent with Generative AI for Figma-to-UI conversion",
-      "Contributed to backend with Java Spring Boot, Kafka, RabbitMQ",
-    ],
-    technologies: [
-      "React",
-      "TypeScript",
-      "Java Spring Boot",
-      "Kafka",
-      "RabbitMQ",
-      "MariaDB",
-      "Playwright",
-      "Generative AI",
-    ],
-    achievements: [
-      "Accelerated design-to-production pipeline with AI",
-      "Develped Centralized Knoledge Base of Company",
-    ],
-    link: "https://www.linkedin.com/company/papaya-global",
-  },
-  {
-    id: 2,
-    company: "AlphaBI",
-    logo: "/images/companies/alphabi.jpeg",
-    role: "SDE Intern",
-    duration: "7 months",
-    period: "Jan 2024 - Aug 2024",
-    description: [
-      "Implemented Next.js 14, Prisma, Strapi, Kafka, Docker",
-      "Enhanced company website with SEO optimizations",
-      "Worked on a real-time health monitoring app with Flutter",
-    ],
-    technologies: [
-      "Next.js 14",
-      "Prisma",
-      "Strapi",
-      "Kafka",
-      "Flutter",
-      "Docker",
-      "TypeScript",
-    ],
-    achievements: [
-      "Increased UX of the websites",
-      "Improved the design of real-time health monitoring app",
-    ],
-    link: "https://www.linkedin.com/company/techalphabi",
-  },
-  {
-    id: 3,
-    company: "Intelligent Cloud Applications",
-    logo: "/images/companies/cloud-application.jpeg",
-    role: "SDE Part Time",
-    duration: "10 months",
-    period: "Mar 2023 - Dec 2023",
-    description: [
-      "Built serverless backend and interactive frontend service",
-      "Optimized legacy backend for low API overhead",
-      "Led technical team as Tech Lead",
-    ],
-    technologies: ["Serverless", "React", "Node.js", "AWS", "Next.js", "AWS"],
-    achievements: [
-      "Reduced server load by 50%",
-      "Designed scalable architecture for future growth",
-    ],
-    link: "https://www.linkedin.com/company/icloudapps/",
-  },
-];
-
-const Experience = () => {
+const Experience = ({ data: EXPERIENCES }: ExperienceProps) => {
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -160,19 +76,19 @@ const Experience = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="hidden lg:grid grid-cols-4 gap-3 flex-shrink-0"
             >
-              <div className="bg-white backdrop-blur-sm border border-white/10 p-4 text-center hover:bg-white/10 transition-colors min-w-[100px]">
+              <div className="bg-white backdrop-blur-sm border border-white/10 p-4 text-center hover:bg-white/90 transition-colors min-w-[100px]">
                 <div className="text-2xl font-light text-black mb-1">2.5+</div>
                 <p className="text-black/40 text-xs font-light">Years</p>
               </div>
-              <div className="bg-white backdrop-blur-sm border border-white/10 p-4 text-center hover:bg-white/10 transition-colors min-w-[100px]">
+              <div className="bg-white backdrop-blur-sm border border-white/10 p-4 text-center hover:bg-white/90 transition-colors min-w-[100px]">
                 <div className="text-2xl font-light text-black mb-1">3</div>
                 <p className="text-black/40 text-xs font-light">Companies</p>
               </div>
-              <div className="bg-white backdrop-blur-sm border border-white/10 p-4 text-center hover:bg-white/10 transition-colors min-w-[100px]">
+              <div className="bg-white backdrop-blur-sm border border-white/10 p-4 text-center hover:bg-white/90 transition-colors min-w-[100px]">
                 <div className="text-2xl font-light text-black mb-1">15+</div>
                 <p className="text-black/40 text-xs font-light">Projects</p>
               </div>
-              <div className="bg-white backdrop-blur-sm border border-white/10 p-4 text-center hover:bg-white/10 transition-colors min-w-[100px]">
+              <div className="bg-white backdrop-blur-sm border border-white/10 p-4 text-center hover:bg-white/90 transition-colors min-w-[100px]">
                 <div className="text-2xl font-light text-black mb-1">10+</div>
                 <p className="text-black/40 text-xs font-light">Technologies</p>
               </div>

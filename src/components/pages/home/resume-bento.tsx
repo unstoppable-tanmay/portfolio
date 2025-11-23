@@ -1,5 +1,6 @@
 "use client";
 
+import { TANMAY_TYPE } from "@/app/page";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState } from "react";
@@ -12,9 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-const RESUME_URL = "/tanmay_kumar.pdf"; // Place your PDF in public folder
-
-const ResumeBento = () => {
+const ResumeBento = ({ data }: { data: TANMAY_TYPE }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const pdfTileRef = useRef<HTMLDivElement>(null);
@@ -102,7 +101,7 @@ const ResumeBento = () => {
 
   const handleDownload = () => {
     const link = document.createElement("a");
-    link.href = RESUME_URL;
+    link.href = data.resume.pdfUrl;
     link.download = "Resume.pdf";
     link.click();
   };
@@ -280,7 +279,7 @@ const ResumeBento = () => {
                         }}
                       >
                         <Document
-                          file={RESUME_URL}
+                          file={data.resume.pdfUrl}
                           onLoadSuccess={onDocumentLoadSuccess}
                           className="flex items-center justify-center"
                           loading={
@@ -363,7 +362,9 @@ const ResumeBento = () => {
               ref={experienceRef}
               className="bg-zinc-950 border border-white/5 p-6 group hover:border-white/10 transition-all duration-300"
             >
-              <div className="text-3xl font-mono text-white mb-1">3+</div>
+              <div className="text-3xl font-mono text-white mb-1">
+                {data.meta.totalExperience}
+              </div>
               <p className="text-white/40 text-xs">Years</p>
             </div>
 
@@ -372,7 +373,9 @@ const ResumeBento = () => {
               ref={projectsRef}
               className="bg-zinc-950 border border-white/5 p-6 group hover:border-white/10 transition-all duration-300"
             >
-              <div className="text-3xl font-mono text-white mb-1">15+</div>
+              <div className="text-3xl font-mono text-white mb-1">
+                {data.meta.totalProjects}
+              </div>
               <p className="text-white/40 text-xs">Projects</p>
             </div>
 
@@ -383,21 +386,17 @@ const ResumeBento = () => {
             >
               <h3 className="text-white text-sm font-medium mb-3">Skills</h3>
               <div className="flex flex-wrap gap-1">
-                {[
-                  "React",
-                  "TypeScript",
-                  "Next.js",
-                  "Node.js",
-                  "Python",
-                  "AWS",
-                ].map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-2 py-0.5 border border-white/10 text-white/60 text-xs font-mono"
-                  >
-                    {skill}
-                  </span>
-                ))}
+                {data.skills
+                  .sort((a, b) => (a.percentage > b.percentage ? -1 : 1))
+                  .slice(0, 6)
+                  .map((skill) => (
+                    <span
+                      key={skill.name}
+                      className="px-2 py-0.5 border border-white/10 text-white/60 text-xs font-mono"
+                    >
+                      {skill.name}
+                    </span>
+                  ))}
               </div>
             </div>
 
@@ -407,7 +406,9 @@ const ResumeBento = () => {
               className="col-span-2 lg:col-span-1 bg-zinc-950 border border-white/5 p-6 group hover:border-white/10 transition-all duration-300"
             >
               <h3 className="text-white text-sm font-medium mb-1">Status</h3>
-              <p className="text-white/40 text-xs">Open to work</p>
+              <p className="text-white/40 text-xs">
+                {data.meta.availability.status}
+              </p>
             </div>
           </div>
         </div>

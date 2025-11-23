@@ -5,6 +5,7 @@ export type TreemapNode = HierarchyRectangularNode<StackItem>;
 export type StackItem = {
   name: string;
   percentage: number;
+  description?: string;
   children?: StackItem[];
 };
 

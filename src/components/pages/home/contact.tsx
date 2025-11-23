@@ -1,12 +1,13 @@
 "use client";
 
+import { TANMAY_TYPE } from "@/app/page";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Contact = () => {
+const Contact = ({ data }: { data: TANMAY_TYPE }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,13 +47,10 @@ const Contact = () => {
       {/* Circular Gradient Background */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Blue circle at bottom */}
-        <div className="absolute left-1/2 translate-x-[-50%] top-[70vh] w-[300vw] aspect-square rounded-full bg-blue-500" />
+        <div className="absolute left-1/2 translate-x-[-50%] top-[70vh] w-[300vw] aspect-square rounded-full bg-blue-500 blur-[120px]" />
 
         {/* White circle overlapping - smaller and less opaque */}
-        <div className="absolute left-1/2 translate-x-[-53%] top-[80vh] w-[300vw] aspect-square rounded-full bg-white" />
-
-        {/* Top gradient blur layer */}
-        <div className="absolute top-0 left-0 right-0 w-full h-full backdrop-blur-[120px]"></div>
+        <div className="absolute left-1/2 translate-x-[-53%] top-[80vh] w-[300vw] aspect-square rounded-full bg-white blur-[120px]" />
       </div>
 
       {/* Content */}
@@ -75,7 +73,10 @@ const Contact = () => {
                 Based In
               </h3>
               <div className="text-white text-sm font-light space-y-1">
-                <p>Bangalore, India</p>
+                <p>
+                  {data.personal.location.city},{" "}
+                  {data.personal.location.country}
+                </p>
               </div>
             </div>
 
@@ -86,10 +87,10 @@ const Contact = () => {
               </h3>
               <div className="text-white text-sm font-light space-y-1">
                 <a
-                  href="mailto:tanmaypanda752@gmail.com"
+                  href={`mailto:${data.personal.email}`}
                   className="block text-white hover:text-white/70 transition-colors underline decoration-1 underline-offset-2"
                 >
-                  tanmaypanda752@gmail.com
+                  {data.personal.email}
                 </a>
               </div>
             </div>
@@ -100,8 +101,10 @@ const Contact = () => {
                 Open To
               </h3>
               <div className="text-white text-sm font-light space-y-1">
-                <p>Freelance Projects</p>
-                <p>Full-time Opportunities</p>
+                {data.meta.availability.freelance && <p>Freelance Projects</p>}
+                {data.meta.availability.fullTime && (
+                  <p>Full-time Opportunities</p>
+                )}
               </div>
             </div>
 
@@ -112,7 +115,7 @@ const Contact = () => {
               </h3>
               <div className="text-white text-sm font-light space-y-1">
                 <a
-                  href="https://github.com/unstoppable-tanmay"
+                  href={data.social.github}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-white hover:text-white/70 transition-colors underline decoration-1 underline-offset-2"
@@ -120,7 +123,7 @@ const Contact = () => {
                   GitHub
                 </a>
                 <a
-                  href="https://linkedin.com/in/tanmay-kumar-panda"
+                  href={data.social.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-white hover:text-white/70 transition-colors underline decoration-1 underline-offset-2"
@@ -128,7 +131,7 @@ const Contact = () => {
                   LinkedIn
                 </a>
                 <a
-                  href="https://medium.com/@tanmaypanda752"
+                  href={data.social.medium}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-white hover:text-white/70 transition-colors underline decoration-1 underline-offset-2"
@@ -143,11 +146,10 @@ const Contact = () => {
         {/* Bottom Section */}
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <p className="contact-item text-white/40 text-xs font-light">
-            © 2025 Tanmay Kumar • Available for freelance & full-time
-            opportunities
+            {data.meta.copyright}
           </p>
           <a
-            href="/resume.pdf"
+            href={data.social.resume}
             download
             className="contact-item inline-flex items-center gap-2 text-white hover:text-white/70 text-sm font-light transition-colors underline decoration-1 underline-offset-2 border border-white/20 hover:border-white/40 px-4 py-2"
           >

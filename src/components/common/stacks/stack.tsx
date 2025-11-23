@@ -67,20 +67,35 @@ export const Stack = ({
             if (!open) setZ(i == 0 ? 2 : 1);
           }}
           className={
-            "expandable absolute w-[98%] h-[98%] text-[clamp(15px,1vw,150%)] font-light select-none"
+            "expandable absolute w-[98%] h-[98%] text-[clamp(15px,1vw,150%)] font-light select-none flex flex-col items-center justify-center"
           }
           style={{
             backgroundColor: color.color,
             color: color.textColor,
           }}
         >
-          <motion.div
-            className={
-              "heading absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            }
-          >
+          <motion.div className={"heading"} layout>
             {leaf.data.name}
           </motion.div>
+
+          {open && (
+            <motion.p
+              layout
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 1.2 }}
+              className="text-[clamp(12px,1vw,16px)] font-light max-w-3xl text-center leading-relaxed mt-6"
+            >
+              {leaf.data.description || "No description available."}
+            </motion.p>
+          )}
+
+          {open && (
+            <div className="text-xs absolute bottom-10">
+              [click anywhere or Esc to close]
+            </div>
+          )}
         </motion.div>
       </div>
     </motion.div>

@@ -1,5 +1,6 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
+import { TANMAY_TYPE } from "@/app/page";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
@@ -9,7 +10,8 @@ import { MdOutlineAlternateEmail } from "react-icons/md";
 import Me from "../../common/landing/me";
 
 gsap.registerPlugin(useGSAP);
-const Landing = () => {
+
+const Landing = ({ data }: { data: TANMAY_TYPE }) => {
   const container = useRef<HTMLElement>(null);
   const imageRef = useRef<SVGSVGElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -171,7 +173,7 @@ const Landing = () => {
       >
         {/* Content */}
         <h2 className="profession flex-1 flex justify-end max-md:items-end text-[clamp(14px,1vw,18px)] font-light translate-y-[0%] text-black/80">
-          Software Engineer
+          {data.personal.profession}
         </h2>
         <div className="relative h-[70svh] lg:h-[95svh] aspect-[0.828125]">
           <Me
@@ -181,40 +183,42 @@ const Landing = () => {
           />
         </div>
         <h2 className="name_final flex-1 flex justify-start text-[clamp(14px,1vw,18px)] font-light translate-y-[0%] text-black/80">
-          Tanmay Kumar
+          {data.personal.name}
         </h2>
 
         {/* Peripheral Info - Desktop Only */}
         {/* Top Left - Quick Actions */}
-        <div className="peripheral-top-left absolute top-8 left-8 hidden md:flex flex-col gap-2">
-          <a
-            href="/test-1"
-            className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group flex items-center gap-1.5"
-          >
-            <span className="group-hover:underline">Resume</span>
-            <span className="text-[8px]">↓</span>
-          </a>
-          <a
-            href="https://linkedin.com/in/tanmay-kumar-panda"
-            target="_blank"
-            className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group"
-          >
-            <span className="group-hover:underline">LinkedIn</span>
-          </a>
-          <a
-            href="https://github.com/unstoppable-tanmay"
-            target="_blank"
-            className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group"
-          >
-            <span className="group-hover:underline">GitHub</span>
-          </a>
-          <a
-            href="https://medium.com/@tanmaypanda752"
-            target="_blank"
-            className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group"
-          >
-            <span className="group-hover:underline">Medium</span>
-          </a>
+        <div className="peripheral-top-left absolute top-8 left-8 hidden md:flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
+            <a
+              href={data.social.resume}
+              className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group flex items-center gap-1.5"
+            >
+              <span className="group-hover:underline">Resume</span>
+              <span className="text-[8px]">↓</span>
+            </a>
+            <a
+              href={data.social.linkedin}
+              target="_blank"
+              className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group"
+            >
+              <span className="group-hover:underline">LinkedIn</span>
+            </a>
+            <a
+              href={data.social.github}
+              target="_blank"
+              className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group"
+            >
+              <span className="group-hover:underline">GitHub</span>
+            </a>
+            <a
+              href={data.social.medium}
+              target="_blank"
+              className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group"
+            >
+              <span className="group-hover:underline">Medium</span>
+            </a>
+          </div>
         </div>
 
         {/* Top Right - Skills with 3D depth */}
@@ -222,129 +226,118 @@ const Landing = () => {
           className="peripheral-top-right absolute top-8 right-8 hidden md:flex flex-col gap-2"
           style={{ transformStyle: "preserve-3d" }}
         >
-          <div className="text-[9px] font-light text-black/50 mb-1">
-            Available for work
+          <div className="text-[9px] font-light text-right text-black/50 mb-1">
+            {data.meta.availability.status}
           </div>
-          <div className="text-[10px] hover:translate-z-[10px] cursor-pointer p-3 -m-3 duration-100 font-light text-black/70 text-right">
-            React
-          </div>
-          <div className="text-[10px] hover:translate-z-[10px] cursor-pointer p-3 -m-3 duration-100 font-light text-black/70 text-right">
-            TypeScript
-          </div>
-          <div className="text-[10px] hover:translate-z-[10px] cursor-pointer p-3 -m-3 duration-100 font-light text-black/70 text-right">
-            Next.js
-          </div>
-          <div className="text-[10px] hover:translate-z-[10px] cursor-pointer p-3 -m-3 duration-100 font-light text-black/70 text-right">
-            Node.js
-          </div>
+          {data.skills
+            .sort((a, b) => (a.percentage > b.percentage ? -1 : 1))
+            .slice(0, 4)
+            .map((skill, index) => (
+              <div
+                key={index}
+                className="text-[10px] hover:translate-z-[10px] cursor-pointer p-3 -m-3 duration-100 font-light text-black/70 text-right"
+              >
+                {skill.name}
+              </div>
+            ))}
           <div className="text-[9px] font-light text-black/50 text-right mt-1">
-            15+ Technologies
+            {data.meta.totalTechnologies}
           </div>
         </div>
 
         {/* Bottom Left - Location & Projects */}
         <div className="peripheral-bottom-left absolute bottom-8 left-8 hidden md:flex flex-col gap-3">
+          <div className="text-[10px] text-black/60 font-Poppins">
+            My Top Ideas
+          </div>
+          {data.projects.slice(0, 2).map((project, index) => (
+            <a
+              key={project.id}
+              href={`#project-card-${project.id}`}
+              className={`text-[10px] font-light ${
+                index === 0 ? "text-black/70" : "text-black/60"
+              } hover:text-black/80 transition-colors pointer-events-auto group no-underline p-3 -m-3`}
+            >
+              <span className="group-hover:underline">{project.title}</span>
+              <span className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                →
+              </span>
+              <div className="text-[8px] text-black/50 mt-0.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                {project.stacks?.slice(0, 3).join(", ")}
+              </div>
+            </a>
+          ))}
           <div className="flex gap-1 flex-col">
             <a
-              href="mailto:tanmaypanda752@gmail.com"
+              href={`mailto:${data.personal.email}`}
               className="text-[9px] font-light text-black/70 cursor-pointer flex items-center gap-1 no-underline"
             >
               <span>
                 <MdOutlineAlternateEmail />
               </span>
-              <span>tanmaypanda752@gmail.com</span>
+              <span>{data.personal.email}</span>
             </a>
             <a
-              href="https://share.google/REPATkpRwU69G0MQE"
+              href={data.personal.location.mapLink}
               className="text-[9px] font-light text-black/70 cursor-pointer flex items-center gap-1 no-underline"
             >
               <span>
                 <CiMapPin />
               </span>
-              <span>Banglure, India</span>
+              <span>
+                {data.personal.location.city}, {data.personal.location.country}
+              </span>
             </a>
           </div>
-          <a
-            href="#project-1"
-            className="text-[10px] font-light text-black/70 hover:text-black/80 transition-colors pointer-events-auto group no-underline p-3 -m-3"
-          >
-            <span className="group-hover:underline">Project Alpha</span>
-            <span className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              →
-            </span>
-            <div className="text-[8px] text-black/50 mt-0.5 opacity-40 group-hover:opacity-100 transition-opacity">
-              React • TypeScript • 2024
-            </div>
-          </a>
-          <a
-            href="#project-2"
-            className="text-[10px] font-light text-black/60 hover:text-black/80 transition-colors pointer-events-auto group no-underline p-3 -m-3"
-          >
-            <span className="group-hover:underline">Project Beta</span>
-            <span className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              →
-            </span>
-            <div className="text-[8px] text-black/50 mt-0.5 opacity-40 group-hover:opacity-100 transition-opacity">
-              Next.js • Node.js • 2024
-            </div>
-          </a>
         </div>
 
         {/* Bottom Right - Experience Timeline with Arc */}
         <div className="peripheral-bottom-right absolute bottom-8 right-8 hidden md:flex flex-col items-end gap-2">
           <div className="flex items-center gap-4">
-            <div className="text-right group">
-              <div className="text-[9px] font-light text-black/50 pointer-events-none">
-                2023-2024
-              </div>
-              <a
-                href="https://www.linkedin.com/company/techalphabi"
-                target="_blank"
-                className="flex gap-0.5 items-center justify-center no-underline"
-              >
-                <img
-                  src="images/companies/alphabi.jpeg"
-                  alt=""
-                  className="w-[12px] aspect-square object-fill"
-                />
-                <span className="text-[10px] font-normal text-black/60">
-                  AlphaBI.
-                </span>
-              </a>
-              <div className="text-[8px] font-light text-black/50 pointer-events-none">
-                SDE
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-[1px] bg-black/50"></div>
-              <FaArrowRightLong className="text-black/50 text-[10px]" />
-              <div className="w-4 h-[1px] bg-black/50"></div>
-            </div>
-            <div className="text-right group">
-              <div className="text-[9px] font-light text-black/50 pointer-events-none">
-                2024-Present
-              </div>
-              <a
-                href="https://www.linkedin.com/company/papaya-global"
-                target="_blank"
-                className="flex gap-0.5 items-center justify-center no-underline"
-              >
-                <img
-                  src="images/companies/papaya.png"
-                  alt=""
-                  className="w-[15px] aspect-square object-fill"
-                />
-                <span className="text-[10px] font-normal text-black/60">
-                  Papaya Global.
-                </span>
-              </a>
-              <div className="text-[8px] font-light text-black/50 pointer-events-none">
-                SDE 1
-              </div>
-            </div>
+            {data.experience
+              .slice(0, 2)
+              .reverse()
+              .map((item, index) => (
+                <>
+                  {index > 0 && (
+                    <div
+                      key={`arrow-${index}`}
+                      className="flex items-center gap-2"
+                    >
+                      <div className="w-4 h-[1px] bg-black/50"></div>
+                      <FaArrowRightLong className="text-black/50 text-[10px]" />
+                      <div className="w-4 h-[1px] bg-black/50"></div>
+                    </div>
+                  )}
+                  <div key={item.company} className="text-right group">
+                    <div className="text-[9px] font-light text-black/50 pointer-events-none">
+                      {item.period}
+                    </div>
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      className="flex gap-0.5 items-center justify-end no-underline"
+                    >
+                      <img
+                        src={item.logo}
+                        alt=""
+                        className={`${
+                          index === 0 ? "w-[12px]" : "w-[15px]"
+                        } aspect-square object-fill`}
+                      />
+                      <span className="text-[10px] font-normal text-black/60">
+                        {item.company}
+                      </span>
+                    </a>
+                    <div className="text-[8px] font-light text-black/50 pointer-events-none">
+                      {item.role}
+                    </div>
+                  </div>
+                </>
+              ))}
           </div>
           <div className="text-[10px] font-light text-black/70 pointer-events-none">
-            3+ Years Experience
+            {data.meta.totalExperience} Of Building Tech
           </div>
         </div>
 

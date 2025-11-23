@@ -1,7 +1,45 @@
 "use client";
+import { TANMAY_TYPE } from "@/app/page";
 import { TechStackTreemap } from "@/components/common/stacks";
+import { useRef, useState } from "react";
 
-const Stacks = () => {
+interface StacksProps {
+  data: TANMAY_TYPE["skills"];
+}
+
+const Stacks = ({ data }: StacksProps) => {
+  const [showTooltip, setShowTooltip] = useState<boolean>(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+
+  const tooltipTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pdfContainerRef = useRef<HTMLDivElement>(null);
+
+  // Handle mouse movement for tooltip
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Update tooltip position
+    setTooltipPosition({ x: e.clientX, y: e.clientY });
+
+    // Hide tooltip when moving
+    setShowTooltip(false);
+
+    // Clear existing timer
+    if (tooltipTimerRef.current) {
+      clearTimeout(tooltipTimerRef.current);
+    }
+
+    // Set new timer to show tooltip after 1.5 seconds of no movement
+    tooltipTimerRef.current = setTimeout(() => {
+      setShowTooltip(true);
+    }, 300);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+    if (tooltipTimerRef.current) {
+      clearTimeout(tooltipTimerRef.current);
+    }
+  };
+
   return (
     <main className="section min-h-screen font-Poppins relative flex items-center justify-center overflow-hidden flex-col">
       {/* Section Header */}
@@ -10,32 +48,26 @@ const Stacks = () => {
           Stacks
         </h2>
       </div>
-      <div className="wrapper h-screen w-full">
-        <TechStackTreemap
-          stacks={[
-            { name: "React & Next.Js", percentage: 12 },
-            { name: "Tailwind CSS", percentage: 5 },
-            { name: "TypeScript", percentage: 7 },
-            { name: "JavaScript (ES6+)", percentage: 5 },
-            { name: "HTML5", percentage: 4 },
-            { name: "CSS3", percentage: 4 },
-
-            { name: "Node.js", percentage: 8 },
-            { name: "Express.js", percentage: 5 },
-            { name: "Java", percentage: 6 },
-            { name: "Spring Boot", percentage: 5 },
-            { name: "PostgreSQL", percentage: 4 },
-            { name: "MongoDB", percentage: 4 },
-            { name: "GraphQL", percentage: 3 },
-
-            { name: "Python", percentage: 5 },
-            { name: "TensorFlow", percentage: 3 },
-            { name: "PyTorch", percentage: 3 },
-            { name: "Scikit-learn", percentage: 2 },
-            { name: "Pandas", percentage: 2 },
-            { name: "AWS", percentage: 6 },
-          ]}
-        />
+      <div
+        className="wrapper h-screen w-full"
+        ref={pdfContainerRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        <TechStackTreemap stacks={data} />
+        {showTooltip && (
+          <div
+            className="fixed z-50 pointer-events-none"
+            style={{
+              left: tooltipPosition.x + 15,
+              top: tooltipPosition.y + 15,
+            }}
+          >
+            <div className="bg-black/90 text-white text-xs px-3 py-2 rounded shadow-lg whitespace-nowrap backdrop-blur-sm border border-white/10">
+              Click To See More
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

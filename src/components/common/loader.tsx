@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import React from "react";
 
 const Loader = () => {
   return (
@@ -19,7 +18,7 @@ const Loader = () => {
               opacity: 1,
             }}
             transition={{
-              duration: 0.3,
+              duration: 0.6,
               delay: index / 8,
               bounce: 0.3,
               damping: 0.4,

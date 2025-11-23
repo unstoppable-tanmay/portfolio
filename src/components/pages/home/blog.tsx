@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { TANMAY_TYPE } from "@/app/page";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState } from "react";
@@ -17,24 +18,23 @@ interface Article {
   categories: string[];
 }
 
-const Blog = () => {
+const Blog = ({ data }: { data: TANMAY_TYPE }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const MEDIUM_USERNAME = "tanmaypanda752";
-  const PROFILE_IMAGE = "/images/me.svg"; // Add your profile image
-
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch(`/api/medium?username=${MEDIUM_USERNAME}`);
-        const data = await response.json();
+        const response = await fetch(
+          `/api/medium?username=${data.blog.username}`
+        );
+        const res = await response.json();
 
-        if (data.status === "ok" && data.items.length > 0) {
-          setArticles(data.items.slice(0, 3)); // Get latest 3 articles
+        if (res.status === "ok" && res.items.length > 0) {
+          setArticles(res.items.slice(0, data.blog.articlesToShow)); // Get latest articles
         } else {
           setError(true);
         }
@@ -110,7 +110,7 @@ const Blog = () => {
                 Articles coming soon
               </div>
               <a
-                href={`https://medium.com/@${MEDIUM_USERNAME}`}
+                href={`https://medium.com/@${data.blog.username}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-black/70 text-xs font-light hover:text-black transition-colors flex items-center gap-2 border border-black/10 px-4 py-2"
@@ -224,7 +224,7 @@ const Blog = () => {
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-black/5 border border-black/10 overflow-hidden">
                     <img
-                      src={PROFILE_IMAGE}
+                      src={data.blog.profileImage}
                       alt="Profile"
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -234,7 +234,7 @@ const Blog = () => {
                   </div>
                   <div>
                     <div className="text-black text-sm font-normal">
-                      Tanmay Kumar
+                      {data.personal.name}
                     </div>
                     <div className="text-black/40 text-xs font-light">
                       {articles.length}+ articles on Medium
@@ -242,7 +242,7 @@ const Blog = () => {
                   </div>
                 </div>
                 <a
-                  href={`https://medium.com/@${MEDIUM_USERNAME}`}
+                  href={`https://medium.com/@${data.blog.username}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="border border-black/20 text-black/70 hover:bg-black hover:text-white transition-all duration-300 px-4 py-2 text-xs font-light flex items-center gap-2"

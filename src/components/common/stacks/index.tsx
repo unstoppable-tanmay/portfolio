@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import { useMediaQuery } from "@/hooks/use-media";
 import { hierarchy, treemap } from "d3";
 import { throttle } from "lodash";
-import { generateGrayShadesArray } from "./utils";
-import { StackItem, TechStackTreemapProps, TreemapNode } from "./types";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Stack } from "./stack";
-import { useLenis } from "@/providers/lenis-provider";
-import { useMediaQuery } from "@/hooks/use-media";
+import { StackItem, TechStackTreemapProps, TreemapNode } from "./types";
+import { generateGrayShadesArray } from "./utils";
 
 export const TechStackTreemap: React.FC<TechStackTreemapProps> = ({
   stacks,
@@ -57,6 +56,7 @@ export const TechStackTreemap: React.FC<TechStackTreemapProps> = ({
       children: stacks.map((s) => ({
         name: s.name,
         percentage: s.percentage,
+        description: s.description,
       })),
     })
       .sum((d) =>

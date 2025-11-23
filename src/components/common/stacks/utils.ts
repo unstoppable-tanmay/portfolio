@@ -9,7 +9,11 @@ export function generateGrayShadesArray(
   const getRandomGrayShade = (exclude?: string): string => {
     let color: string;
     do {
-      const gray = Math.floor(Math.random() * 256);
+      // Generate either dark (0-80) or light (175-255) gray values for high contrast
+      const isDark = Math.random() > 0.5;
+      const gray = isDark
+        ? Math.floor(Math.random() * 80) // 0-80 for dark shades
+        : Math.floor(Math.random() * 80) + 175; // 175-255 for light shades
       const hex = gray.toString(16).padStart(2, "0");
       color = `#${hex}${hex}${hex}`;
     } while (color === exclude);
