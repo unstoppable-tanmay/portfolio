@@ -2,8 +2,11 @@
 "use client";
 
 import { TANMAY_TYPE } from "@/app/page";
+import SemanticSearchModal from "@/components/common/semantic-search-modal";
+import SementicSearchButton from "@/components/common/sementic-search-button";
+import { useSemanticSearch } from "@/providers/semantic-search-provider";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ExperienceProps {
   data: TANMAY_TYPE["experience"];
@@ -11,6 +14,119 @@ interface ExperienceProps {
 
 const Experience = ({ data: EXPERIENCES }: ExperienceProps) => {
   const sectionRef = useRef<HTMLElement>(null);
+  const { extractor, loading: ModelLoading, error: ModelError } = useSemanticSearch();
+  const [openInputModal, setOpenInputModal] = useState(false);
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const experienceEmbeddingsRef = useRef<any[]>([]);
+
+  // Cosine similarity function
+  function cosineSimilarity(a: number[], b: number[]) {
+    const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
+    const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+    const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
+  }
+
+  useEffect(() => {
+    async function computeEmbeddings() {
+      if (!extractor || !openInputModal) return;
+      if (experienceEmbeddingsRef.current.length > 0) return; // Already computed
+
+      try {
+        const items = EXPERIENCES.flatMap((exp) => [
+          { ...exp, text: `${exp.role} at ${exp.company}`, type: 'role' },
+          ...exp.description.map(desc => ({ ...exp, text: desc, type: 'description' })),
+          ...exp.achievements.map(ach => ({ ...exp, text: ach, type: 'achievement' })),
+          ...exp.technologies.map(skill => ({ ...exp, text: skill, type: 'skill' })),
+          ...exp.ai.map(ai => ({ ...exp, text: ai, type: 'description' }))
+        ]);
+
+        const embeddings = [];
+        for (const item of items) {
+          const output = await extractor(item.text, { pooling: "mean", normalize: true });
+          embeddings.push({ item, embedding: Array.from(output.data) as number[] });
+        }
+        experienceEmbeddingsRef.current = embeddings;
+      } catch (err) {
+        console.error("Failed to compute experience embeddings:", err);
+      }
+    }
+
+    if (!ModelLoading && extractor && openInputModal) {
+      computeEmbeddings();
+    }
+  }, [extractor, ModelLoading, EXPERIENCES, openInputModal]);
+
+  // Clear embeddings when modal closes
+  useEffect(() => {
+    if (!openInputModal) {
+      experienceEmbeddingsRef.current = [];
+      setSearchResults([]);
+      setQuery("");
+    }
+  }, [openInputModal]);
+
+  const handleSearch = async (searchQuery: string) => {
+    if (!searchQuery.trim() || !extractor) return;
+
+    try {
+      const output = await extractor(searchQuery, { pooling: "mean", normalize: true });
+      const queryEmbedding = Array.from(output.data) as number[];
+
+      const matches = experienceEmbeddingsRef.current.map((entry) => ({
+        item: entry.item,
+        score: cosineSimilarity(queryEmbedding, entry.embedding),
+      }));
+
+      // Group matches by company
+      const companyGroups = matches.reduce((acc: any, match) => {
+        const company = match.item.company;
+        if (!acc[company]) {
+          acc[company] = {
+            company: company,
+            logo: match.item.logo,
+            maxScore: 0,
+            matches: []
+          };
+        }
+        if (match.score > 0.30) {
+          acc[company].matches.push(match);
+          acc[company].maxScore = Math.max(acc[company].maxScore, match.score);
+        }
+        return acc;
+      }, {});
+
+      // Convert to array, sort by maxScore, and take top 3
+      const topCompanies = Object.values(companyGroups)
+        .filter((group: any) => group.matches.length > 0)
+        .sort((a: any, b: any) => b.maxScore - a.maxScore)
+        .slice(0, 3);
+
+      // Group matches by type within each company
+      const finalResults = topCompanies.map((group: any) => {
+        const typeGroups = group.matches.reduce((acc: any, match: any) => {
+          const type = match.item.type;
+          if (!acc[type]) acc[type] = [];
+          acc[type].push(match);
+          return acc;
+        }, {});
+        return { ...group, types: typeGroups };
+      });
+
+      setSearchResults(finalResults);
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (query) handleSearch(query);
+      else setSearchResults([]);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query, extractor]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -55,17 +171,49 @@ const Experience = ({ data: EXPERIENCES }: ExperienceProps) => {
       <div className="sticky top-0 h-screen flex items-center justify-center flex-col overflow-hidden">
         <div className="w-full px-4 md:px-6">
           {/* Header and Footer Stats Container */}
-          <div className="w-full px-6 mb-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8">
+          <div className="w-full max-md:px-0 px-3 mb-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8">
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
+              className="flex gap-3 max-md:gap-1.5 items-center justify-center"
             >
               <h2 className="text-white text-[clamp(30px,4vw,100px)] md:text-[clamp(40px,5vw,150px)] font-normal">
                 Experience
               </h2>
+              <SementicSearchButton loading={ModelLoading} onClick={() => setOpenInputModal(true)} />
+              <SemanticSearchModal isOpen={openInputModal} onClose={() => setOpenInputModal(false)} query={query} setQuery={setQuery} onSubmit={handleSearch}>
+                {searchResults.length > 0 && (
+                  <div className="flex flex-col gap-4 mb-4 overflow-y-auto">
+                    {searchResults.map((group: any, idx) => (
+                      <div key={idx} className="bg-white overflow-y-scroll max-h-[25vh] w-[clamp(200px,640px,94vw)]" data-lenis-prevent>
+                        <div className="px-3 py-2 border-b flex items-center gap-2">
+                          <img src={group.logo} alt={group.company} className="w-5 h-5 object-contain bg-white rounded-sm border border-gray-100" />
+                          <h4 className="text-sm font-medium text-black">{group.company}</h4>
+                        </div>
+                        <div className="p-3 flex flex-col gap-3 " >
+                          {Object.entries(group.types).map(([type, matches]: [string, any], typeIdx) => (
+                            <div key={typeIdx}>
+                              <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">
+                                {type}s
+                              </h5>
+                              <div className={type === 'skill' ? "flex flex-wrap gap-2" : "flex flex-col gap-1"}>
+                                {Array.from<string>(new Set(matches.map((match: any) => match.item.text))).map((uniqueText: string, matchIdx: number) => (
+                                  <div key={matchIdx} className="text-xs text-gray-700 font-light bg-white pl-2 border border-gray-100 rounded hover:border-gray-300 transition-colors">
+                                    {uniqueText}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SemanticSearchModal>
             </motion.div>
 
             {/* Footer Stats - Desktop Only */}
@@ -98,9 +246,8 @@ const Experience = ({ data: EXPERIENCES }: ExperienceProps) => {
           {/* Horizontal Scroll Container */}
           <motion.div
             style={{ x: scrollDistance > 0 ? x : undefined }}
-            className={`flex gap-6 pl-4 md:pl-8 ${
-              scrollDistance === 0 ? "justify-center" : ""
-            }`}
+            className={`flex gap-6 pl-4 md:pl-8 ${scrollDistance === 0 ? "justify-center" : ""
+              }`}
           >
             {EXPERIENCES.map((exp, index) => (
               <motion.div

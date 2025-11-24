@@ -188,7 +188,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
               {/* Hint */}
               <div className="px-8 py-4 border-t border-black/5">
                 <p className="text-xs text-black/30 font-light text-center">
-                  Press ESC to close
+                  Scroll To View More or Press ESC to close
                 </p>
               </div>
             </motion.div>

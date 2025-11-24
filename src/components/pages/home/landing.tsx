@@ -1,17 +1,21 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 import { TANMAY_TYPE } from "@/app/page";
+import { useStateContext } from "@/providers/state-provider";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { Link } from "next-view-transitions";
 import { useEffect, useRef, useState } from "react";
 import { CiMapPin } from "react-icons/ci";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { MdOutlineAlternateEmail } from "react-icons/md";
+import { RiGeminiFill } from "react-icons/ri";
 import Me from "../../common/landing/me";
 
 gsap.registerPlugin(useGSAP);
 
 const Landing = ({ data }: { data: TANMAY_TYPE }) => {
+  const { } = useStateContext();
   const container = useRef<HTMLElement>(null);
   const imageRef = useRef<SVGSVGElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -182,10 +186,22 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
             className="me_as_img h-full w-full object-fill"
           />
         </div>
-        <h2 className="name_final flex-1 flex justify-start text-[clamp(14px,1vw,18px)] font-light translate-y-[0%] text-black/80">
-          {data.personal.name}
-        </h2>
+        <div className="name_final flex flex-1 items-center justify-start gap-2">
+          <h2 className="text-[clamp(14px,1vw,18px)] font-light translate-y-[0%] text-black/80">
+            {data.personal.name}
+          </h2>
+          <Link
+            className="appearance-none outline-none border-none bg-black text-white px-1 font-Poppins text-[clamp(10px,0.8vw,18px)] cursor-pointer flex gap-1 items-center justify-center relative"
+            href="/ai"
+            onClick={() => {
+              document.documentElement.dataset.transition = "forward";
+            }}
+          >
+            <div className="bg absolute w-full aspect-square animate-ping bg-black blur-md opacity-20 -z-10"></div>
+            AI<RiGeminiFill />
+          </Link>
 
+        </div>
         {/* Peripheral Info - Desktop Only */}
         {/* Top Left - Quick Actions */}
         <div className="peripheral-top-left absolute top-8 left-8 hidden md:flex flex-col gap-3">
@@ -254,9 +270,8 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
             <a
               key={project.id}
               href={`#project-card-${project.id}`}
-              className={`text-[10px] font-light ${
-                index === 0 ? "text-black/70" : "text-black/60"
-              } hover:text-black/80 transition-colors pointer-events-auto group no-underline p-3 -m-3`}
+              className={`text-[10px] font-light ${index === 0 ? "text-black/70" : "text-black/60"
+                } hover:text-black/80 transition-colors pointer-events-auto group no-underline p-3 -m-3`}
             >
               <span className="group-hover:underline">{project.title}</span>
               <span className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -321,9 +336,8 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
                       <img
                         src={item.logo}
                         alt=""
-                        className={`${
-                          index === 0 ? "w-[12px]" : "w-[15px]"
-                        } aspect-square object-fill`}
+                        className={`${index === 0 ? "w-[12px]" : "w-[15px]"
+                          } aspect-square object-fill`}
                       />
                       <span className="text-[10px] font-normal text-black/60">
                         {item.company}

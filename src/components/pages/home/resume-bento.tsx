@@ -1,13 +1,16 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { TANMAY_TYPE } from "@/app/page";
+import SemanticSearchModal from "@/components/common/semantic-search-modal";
+import SementicSearchButton from "@/components/common/sementic-search-button";
+import { useSemanticSearch } from "@/providers/semantic-search-provider";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight, FiDownload } from "react-icons/fi";
 import { Document, Page, pdfjs } from "react-pdf";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
-
 gsap.registerPlugin(ScrollTrigger);
 
 // Configure PDF.js worker
@@ -28,14 +31,154 @@ const ResumeBento = ({ data }: { data: TANMAY_TYPE }) => {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isMac, setIsMac] = useState<boolean>(false);
+  const [openInputModal, setOpenInputModal] = useState(false);
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const resumeEmbeddingsRef = useRef<any[]>([]);
 
   const tooltipTimerRef = useRef<NodeJS.Timeout | null>(null);
   const pdfContainerRef = useRef<HTMLDivElement>(null);
+
+  const { extractor, loading: ModelLoading, error: ModelError } = useSemanticSearch();
+
+  // Cosine similarity function
+  function cosineSimilarity(a: number[], b: number[]) {
+    const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
+    const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+    const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
+  }
 
   // Detect OS
   useEffect(() => {
     setIsMac(navigator.platform.toUpperCase().indexOf("MAC") >= 0);
   }, []);
+
+  // Compute embeddings for all resume content only when modal opens
+  useEffect(() => {
+    async function computeEmbeddings() {
+      if (!extractor || !openInputModal) return;
+      if (resumeEmbeddingsRef.current.length > 0) return; // Already computed
+
+      try {
+        const items = [
+          // Personal info
+          { text: data.personal.name, type: 'personal', category: 'name' },
+          { text: data.personal.profession, type: 'personal', category: 'profession' },
+          { text: data.personal.email, type: 'personal', category: 'email' },
+          { text: `${data.personal.location.city}, ${data.personal.location.country}`, type: 'personal', category: 'location' },
+
+          // Experience
+          ...data.experience.flatMap((exp) => [
+            { text: `${exp.role} at ${exp.company}`, type: 'experience', category: exp.company },
+            ...exp.description.map(desc => ({ text: desc, type: 'experience', category: exp.company })),
+            ...exp.achievements.map(ach => ({ text: ach, type: 'experience', category: exp.company })),
+            ...exp.technologies.map(tech => ({ text: tech, type: 'experience', category: exp.company })),
+          ]),
+
+          // Projects
+          ...data.projects.flatMap((proj) => [
+            { text: proj.title, type: 'project', category: proj.title },
+            { text: proj.description, type: 'project', category: proj.title },
+            ...proj.stacks.map(stack => ({ text: stack, type: 'project', category: proj.title })),
+          ]),
+
+          // Skills
+          ...data.skills.flatMap((skill) => [
+            { text: skill.name, type: 'skill', category: skill.name },
+            { text: skill.description, type: 'skill', category: skill.name },
+          ]),
+
+          // Meta
+          { text: data.meta.availability.status, type: 'meta', category: 'availability' },
+          { text: data.meta.totalExperience, type: 'meta', category: 'experience' },
+          { text: data.meta.totalProjects, type: 'meta', category: 'projects' },
+        ];
+
+        const embeddings = [];
+        for (const item of items) {
+          const output = await extractor(item.text, { pooling: "mean", normalize: true });
+          embeddings.push({ item, embedding: Array.from(output.data) as number[] });
+        }
+        resumeEmbeddingsRef.current = embeddings;
+      } catch (err) {
+        console.error("Failed to compute resume embeddings:", err);
+      }
+    }
+
+    if (!ModelLoading && extractor && openInputModal) {
+      computeEmbeddings();
+    }
+  }, [extractor, ModelLoading, data, openInputModal]);
+
+  // Clear embeddings when modal closes
+  useEffect(() => {
+    if (!openInputModal) {
+      resumeEmbeddingsRef.current = [];
+      setSearchResults([]);
+      setQuery("");
+    }
+  }, [openInputModal]);
+
+  const handleSearch = async (searchQuery: string) => {
+    if (!searchQuery.trim() || !extractor) return;
+
+    try {
+      const output = await extractor(searchQuery, { pooling: "mean", normalize: true });
+      const queryEmbedding = Array.from(output.data) as number[];
+
+      const matches = resumeEmbeddingsRef.current.map((entry) => ({
+        item: entry.item,
+        score: cosineSimilarity(queryEmbedding, entry.embedding),
+      }));
+
+      // Group matches by type
+      const typeGroups = matches.reduce((acc: any, match) => {
+        const type = match.item.type;
+        if (!acc[type]) {
+          acc[type] = {
+            type: type,
+            maxScore: 0,
+            matches: []
+          };
+        }
+        if (match.score > 0.40) {
+          acc[type].matches.push(match);
+          acc[type].maxScore = Math.max(acc[type].maxScore, match.score);
+        }
+        return acc;
+      }, {});
+
+      // Convert to array, sort by maxScore, and take top 4 types
+      const topTypes = Object.values(typeGroups)
+        .filter((group: any) => group.matches.length > 0)
+        .sort((a: any, b: any) => b.maxScore - a.maxScore)
+        .slice(0, 4);
+
+      // Group matches by category within each type
+      const finalResults = topTypes.map((group: any) => {
+        const categoryGroups = group.matches.reduce((acc: any, match: any) => {
+          const category = match.item.category;
+          if (!acc[category]) acc[category] = [];
+          acc[category].push(match);
+          return acc;
+        }, {});
+        return { ...group, categories: categoryGroups };
+      });
+
+      setSearchResults(finalResults);
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (query) handleSearch(query);
+      else setSearchResults([]);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query, extractor]);
 
   // GSAP ScrollTrigger animations
   useEffect(() => {
@@ -198,11 +341,41 @@ const ResumeBento = ({ data }: { data: TANMAY_TYPE }) => {
         {/* Header */}
         <div
           ref={headerRef}
-          className="w-full py-4 flex items-center justify-center"
+          className="w-full py-4 px-3 md:px-6 flex items-center md:justify-center gap-3 max-md:gap-1.5"
         >
           <h1 className="text-white text-[clamp(30px,4vw,100px)] md:text-[clamp(40px,5vw,150px)] font-Poppins font-medium mb-1">
             Resume
           </h1>
+          <SementicSearchButton loading={ModelLoading} onClick={() => setOpenInputModal(true)} />
+          <SemanticSearchModal isOpen={openInputModal} onClose={() => setOpenInputModal(false)} query={query} setQuery={setQuery} onSubmit={handleSearch}>
+            {searchResults.length > 0 && (
+              <div className="flex flex-col gap-4 mb-4 overflow-y-auto">
+                {searchResults.map((group: any, idx) => (
+                  <div key={idx} className="bg-white overflow-y-scroll max-h-[20vh] w-[clamp(200px,640px,94vw)] relative" data-lenis-prevent>
+                    <div className="px-3 pt-2 pb-1 border-b flex items-center gap-2 sticky top-0 bg-white">
+                      <h4 className="text-sm font-medium text-black capitalize">{group.type}</h4>
+                    </div>
+                    <div className="p-3 flex flex-col gap-3 max-h-[10vh]">
+                      {Object.entries(group.categories).map(([category, matches]: [string, any], catIdx) => (
+                        <div key={catIdx}>
+                          <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 ml-1">
+                            {category}
+                          </h5>
+                          <div className="flex flex-col gap-1">
+                            {Array.from<string>(new Set(matches.map((match: any) => match.item.text))).map((uniqueText: string, matchIdx: number) => (
+                              <div key={matchIdx} className="text-xs text-gray-700 font-light pl-1.5 bg-white border border-gray-100 rounded hover:border-gray-300 transition-colors">
+                                {uniqueText}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </SemanticSearchModal>
         </div>
 
         {/* Bento Grid Container */}
@@ -228,7 +401,7 @@ const ResumeBento = ({ data }: { data: TANMAY_TYPE }) => {
                 {/* Tooltip */}
                 {showTooltip && (
                   <div
-                    className="fixed z-50 pointer-events-none"
+                    className="fixed z-50 pointer-events-none max-md:hidden"
                     style={{
                       left: tooltipPosition.x + 15,
                       top: tooltipPosition.y + 15,

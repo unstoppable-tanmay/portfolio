@@ -47,9 +47,6 @@ const LenisProvider = ({
 
 export const useLenis = () => {
   const context = useContext(LenisContext);
-  if (context === null) {
-    throw new Error("useLenis must be used within a LenisProvider");
-  }
   return context;
 };
 

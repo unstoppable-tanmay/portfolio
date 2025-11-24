@@ -3,6 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const username = request.nextUrl.searchParams.get("username");
 
+
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
+
+  console.log(ip)
+
   if (!username) {
     return NextResponse.json({ error: "Username required" }, { status: 400 });
   }
@@ -15,7 +23,7 @@ export async function GET(request: NextRequest) {
     )}`;
 
     const response = await fetch(apiUrl, {
-      cache: "no-store",
+      next: { revalidate: 43200 }, // 12 hours in seconds
     });
 
     if (!response.ok) {
@@ -39,10 +47,10 @@ export async function GET(request: NextRequest) {
       // Clean description
       const cleanDescription = item.description
         ? item.description
-            .replace(/<[^>]*>/g, "")
-            .replace(/&nbsp;/g, " ")
-            .trim()
-            .slice(0, 200)
+          .replace(/<[^>]*>/g, "")
+          .replace(/&nbsp;/g, " ")
+          .trim()
+          .slice(0, 200)
         : "";
 
       return {
@@ -55,11 +63,18 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({
-      status: "ok",
-      items,
-      count: items.length,
-    });
+    return NextResponse.json(
+      {
+        status: "ok",
+        items,
+        count: items.length,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=43200, stale-while-revalidate=86400',
+        },
+      }
+    );
   } catch (error) {
     console.error("RSS fetch error:", error);
     return NextResponse.json(
