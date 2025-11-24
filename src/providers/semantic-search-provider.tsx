@@ -3,11 +3,12 @@
 import { env, pipeline } from "@xenova/transformers";
 import React, { createContext, useContext, useRef, useState } from "react";
 
-// Configure to use models from GitHub repo via jsDelivr CDN
-// This fetches from: https://cdn.jsdelivr.net/gh/unstoppable-tanmay/portfolio@main/public/models/
-env.allowRemoteModels = true;
-env.remoteHost = "https://cdn.jsdelivr.net/gh/unstoppable-tanmay/portfolio@main/public/models/";
-env.allowLocalModels = false; // Disable local models, use CDN only
+// Configure to use local models from public/models folder
+// Models are stored in the repo and deployed with the app
+// This avoids HuggingFace dependency and works on all networks
+env.allowLocalModels = true;
+env.localModelPath = "models/";
+env.allowRemoteModels = false;
 
 interface SemanticSearchContextType {
     extractor: any;
