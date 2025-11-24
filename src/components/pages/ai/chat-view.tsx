@@ -114,6 +114,7 @@ export default function ChatView() {
             setMessages((prev) => [...prev, errorMessage]);
         } finally {
             setChatLoading(false);
+            inputRef.current?.focus();
         }
     };
 
