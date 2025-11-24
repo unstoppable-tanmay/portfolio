@@ -354,14 +354,6 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
             {data.meta.totalExperience} Of Building Tech
           </div>
         </div>
-
-        {/* Mobile - Scroll Indicator */}
-        <div className="peripheral-mobile absolute bottom-8 left-1/2 -translate-x-1/2 md:hidden pointer-events-none">
-          <div className="text-[10px] font-light text-black/60 flex items-center gap-2">
-            Scroll to explore
-            <span className="animate-bounce">↓</span>
-          </div>
-        </div>
       </div>
     </main>
   );
