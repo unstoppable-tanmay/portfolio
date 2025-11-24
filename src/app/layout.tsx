@@ -1,3 +1,4 @@
+import GlobalLoader from "@/components/common/global-loader";
 import Loader from "@/components/common/loader";
 import RootProvider from "@/providers/root-provider";
 import "lenis/dist/lenis.css";
@@ -48,10 +49,11 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
       </head>
       <body className={`${inter.className}`}>
+        <GlobalLoader />
         <RootProvider>
           <Suspense
             fallback={
-              <div className="w-full h-screen flex items-center justify-center bg-white">
+              <div className="w-full h-screen flex items-center justify-center bg-black">
                 <Loader />
               </div>
             }

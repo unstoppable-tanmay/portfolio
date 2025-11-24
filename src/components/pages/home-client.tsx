@@ -2,37 +2,24 @@
 
 import dynamic from "next/dynamic";
 import { TANMAY_TYPE } from "../../app/page";
-import Loader from "../common/loader";
 
-const ComponentLoader = () => (
-  <div className="min-h-screen w-full h-full bg-black">
-  </div>
-);
-
-// Lazy load heavy components
+// Lazy load heavy components without loading placeholders
 const Landing = dynamic(() => import("@/components/pages/home/landing"), {
   ssr: false,
-  loading: () => <div className="min-h-screen w-full flex items-center justify-center bg-black">
-    <Loader />
-  </div>,
 });
 const Experience = dynamic(() => import("@/components/pages/home/experience"), {
   ssr: false,
-  loading: () => <ComponentLoader />,
 });
 const Stacks = dynamic(() => import("@/components/pages/home/stacks"), {
   ssr: false,
-  loading: () => <ComponentLoader />,
 });
 const Projects = dynamic(() => import("@/components/pages/home/projects"), {
   ssr: false,
-  loading: () => <ComponentLoader />,
 });
 const ResumeBento = dynamic(
   () => import("@/components/pages/home/resume-bento"),
   {
     ssr: false,
-    loading: () => <ComponentLoader />,
   }
 );
 const Blog = dynamic(() => import("@/components/pages/home/blog"), {
