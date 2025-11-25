@@ -79,7 +79,7 @@ const Projects = ({ data }: ProjectsProps) => {
     setScatterValue(latest);
   });
 
-  const text = "Still Solving More Problems. . .";
+  const text = "Problems Solving Journey is going on...";
   const letterStaggers = useMemo(
     () => text.split("").map(() => Math.random() * 0.3),
     []
@@ -195,29 +195,29 @@ const Projects = ({ data }: ProjectsProps) => {
               translateZ: `${END_TITLE_Z}px`,
               transformStyle: "preserve-3d",
             }}
-            className="text-[clamp(32px,1.5vw,80px)] font-normal font-Poppins text-white/90 pointer-events-none whitespace-nowrap"
+            className="text-[clamp(32px,1vw,80px)] font-normal font-Poppins text-white/90 pointer-events-none whitespace-nowrap"
           >
             {scatterValue > 0
               ? text.split("").map((char, i) => {
-                  const stagger = letterStaggers[i];
-                  const letterProgress = Math.max(
-                    0,
-                    Math.min(1, (scatterValue - stagger) / 0.3)
-                  );
-                  const opacity = 1 - letterProgress;
+                const stagger = letterStaggers[i];
+                const letterProgress = Math.max(
+                  0,
+                  Math.min(1, (scatterValue - stagger) / 0.3)
+                );
+                const opacity = 1 - letterProgress;
 
-                  return (
-                    <span
-                      key={i}
-                      style={{
-                        opacity,
-                        display: "inline-block",
-                      }}
-                    >
-                      {char === " " ? "\u00A0" : char}
-                    </span>
-                  );
-                })
+                return (
+                  <span
+                    key={i}
+                    style={{
+                      opacity,
+                      display: "inline-block",
+                    }}
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </span>
+                );
+              })
               : text}
           </motion.h2>
 

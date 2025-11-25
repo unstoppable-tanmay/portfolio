@@ -1,5 +1,5 @@
 import { random } from "lodash";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import { TreemapNode } from "./types";
 import { expandableVariants } from "./utils";
@@ -57,7 +57,7 @@ export const Stack = ({
       }}
       viewport={{ once: true }}
     >
-      <div className="wrapper w-full h-full relative flex items-center justify-center">
+      <div className="wrapper w-full h-full relative flex items-center justify-center group">
         <motion.div
           onClick={toggle}
           layout
@@ -96,6 +96,16 @@ export const Stack = ({
               [click anywhere or Esc to close]
             </div>
           )}
+
+          <AnimatePresence>
+            {!open ? (
+              <div
+                className="group-hover:flex hidden text-xs absolute bottom-10 opacity-0 group-hover:opacity-100 duration-150"
+              >
+                [click to expand]
+              </div>
+            ) : null}
+          </AnimatePresence>
         </motion.div>
       </div>
     </motion.div>

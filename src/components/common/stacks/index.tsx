@@ -83,9 +83,8 @@ export const TechStackTreemap: React.FC<TechStackTreemapProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`section section_stacks relative w-full h-full flex items-center justify-center ${
-        className ?? ""
-      }`}
+      className={`section section_stacks relative w-full h-full flex items-center justify-center ${className ?? ""
+        }`}
     >
       {(treemapData as TreemapNode[]).map((leaf, i) => {
         // return <Expandable key={i} color={colors[i]} leaf={leaf} i={i} />;

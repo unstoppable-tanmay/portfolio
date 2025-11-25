@@ -40,7 +40,7 @@ function textColorFor(bgHex: string): string {
 export const expandableVariants = (leaf: TreemapNode): Variants => ({
   open: {
     width: "100vw",
-    height: "100vh",
+    height: window.innerWidth >= 1024 ? "85vh" : "90vh",
     left: -leaf.x0,
     top: -leaf.y0,
   },

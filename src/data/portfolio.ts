@@ -47,6 +47,7 @@ export type TANMAY_TYPE = {
     };
     side: string;
     zIndex: number;
+    showInProjects?: true,
   }[];
 
   // Technical Skills
@@ -201,6 +202,7 @@ export const TANMAY: TANMAY_TYPE = {
       },
       side: "left",
       zIndex: -2000 - 1500,
+      showInProjects: true,
     },
     {
       id: 2,
@@ -214,6 +216,7 @@ export const TANMAY: TANMAY_TYPE = {
       },
       side: "right",
       zIndex: -2000 - 1500 - 2000,
+      showInProjects: true,
     },
     {
       id: 3,
@@ -227,6 +230,7 @@ export const TANMAY: TANMAY_TYPE = {
       },
       side: "left",
       zIndex: -2000 - 1500 - 4000,
+      showInProjects: true,
     },
   ],
 

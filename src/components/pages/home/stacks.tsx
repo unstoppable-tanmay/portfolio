@@ -129,32 +129,6 @@ const Stacks = ({ data }: StacksProps) => {
     return () => clearTimeout(timer);
   }, [query, extractor]);
 
-  // Handle mouse movement for tooltip
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Update tooltip position
-    setTooltipPosition({ x: e.clientX, y: e.clientY });
-
-    // Hide tooltip when moving
-    setShowTooltip(false);
-
-    // Clear existing timer
-    if (tooltipTimerRef.current) {
-      clearTimeout(tooltipTimerRef.current);
-    }
-
-    // Set new timer to show tooltip after 1.5 seconds of no movement
-    tooltipTimerRef.current = setTimeout(() => {
-      setShowTooltip(true);
-    }, 300);
-  };
-
-  const handleMouseLeave = () => {
-    setShowTooltip(false);
-    if (tooltipTimerRef.current) {
-      clearTimeout(tooltipTimerRef.current);
-    }
-  };
-
   return (
     <main className="section min-h-screen font-Poppins relative flex items-center justify-center overflow-hidden flex-col">
       {/* Section Header */}
@@ -180,23 +154,8 @@ const Stacks = ({ data }: StacksProps) => {
       <div
         className="wrapper h-[90vh] md:h-[85vh] w-full"
         ref={pdfContainerRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
       >
         <TechStackTreemap stacks={data} />
-        {showTooltip && (
-          <div
-            className="fixed z-50 pointer-events-none max-md:hidden"
-            style={{
-              left: tooltipPosition.x + 15,
-              top: tooltipPosition.y + 15,
-            }}
-          >
-            <div className="bg-black/90 text-white text-xs px-3 py-2 rounded shadow-lg whitespace-nowrap backdrop-blur-sm border border-white/10">
-              Click To See More
-            </div>
-          </div>
-        )}
       </div>
     </main>
   );
