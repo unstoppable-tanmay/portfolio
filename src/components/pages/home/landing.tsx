@@ -8,6 +8,7 @@ import { Link } from "next-view-transitions";
 import { useEffect, useRef, useState } from "react";
 import { CiMapPin } from "react-icons/ci";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { IoMdClose } from "react-icons/io";
 import { MdOutlineAlternateEmail } from "react-icons/md";
 import { RiGeminiFill } from "react-icons/ri";
 import Me from "../../common/landing/me";
@@ -93,6 +94,7 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
 
   const [direction, setDirection] = useState<"left" | "right">("left");
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   // Detect touch device
   useEffect(() => {
@@ -165,6 +167,34 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
     }
   }, [mousePosition, isTouchDevice]);
 
+  // Tooltip logic with localStorage tracking
+  useEffect(() => {
+    const TOOLTIP_KEY = "ai-tooltip-views";
+    const SESSION_KEY = "ai-tooltip-session-shown";
+    const MAX_VIEWS = 3;
+
+    // Get current view count from localStorage
+    const viewCount = parseInt(localStorage.getItem(TOOLTIP_KEY) || "0", 10);
+    // Check if already shown in this session
+    const hasShownInSession = sessionStorage.getItem(SESSION_KEY);
+
+    // Only show if under max views AND not shown in this session
+    if (viewCount < MAX_VIEWS && !hasShownInSession) {
+      // Random delay between 2-3 seconds (2000-3000ms)
+      const randomDelay = Math.random() * 1000 + 2000;
+
+      const timer = setTimeout(() => {
+        setShowTooltip(true);
+        // Increment view count
+        localStorage.setItem(TOOLTIP_KEY, String(viewCount + 1));
+        // Mark as shown in this session
+        sessionStorage.setItem(SESSION_KEY, "true");
+      }, randomDelay);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   return (
     <main
       ref={container}
@@ -191,15 +221,51 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
             {data.personal.name}
           </h2>
           <Link
-            className="appearance-none outline-none border-none bg-black text-white px-1 font-Poppins text-[clamp(10px,0.8vw,18px)] cursor-pointer flex gap-1 items-center justify-center relative"
+            className="appearance-none outline-none border-none bg-black text-white px-1 font-Poppins text-[clamp(10px,0.9vw,18px)] cursor-pointer flex gap-1 items-center justify-center relative z-[110]"
             href="/ai"
             onClick={() => {
               document.documentElement.dataset.transition = "forward";
+              setShowTooltip(false);
             }}
           >
+            {showTooltip && (
+              <>
+                <div className="tooltip absolute top-0 translate-y-[-90%] translate-x-[-80%] left-0 flex gap-1 text-xs z-[110]">
+                  <div className="flex text-nowrap text-white/80 font-Poppins font-normal">Chat With Me</div>
+                  <img src="images/arrow.png" alt="" className="w-10 h-10 rotate-90 invert" />
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowTooltip(false);
+                  }}
+                  className="absolute -top-3 -right-3 z-[120] bg-white text-black rounded-full p-0.5 shadow-md hover:scale-110 transition-transform hidden"
+                  aria-label="Close tooltip"
+                >
+                  <IoMdClose className="w-3 h-3" />
+                </button>
+              </>
+            )}
             <div className="bg absolute w-full aspect-square animate-ping bg-black blur-md opacity-20 -z-10"></div>
             AI<RiGeminiFill />
           </Link>
+
+          {/* Backdrop overlay - Sibling to Link to handle stacking context correctly */}
+          {showTooltip && (
+            <div
+              className="fixed -top-[100vh] -left-[100vw] w-[300vw] h-[300vh] bg-black/70 z-[100] backdrop-blur-[2px]"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowTooltip(false);
+              }}
+            >
+              <div className="wrapper w-full h-full relative flex items-center justify-center">
+                <div className="text-xs translate-y-[40vh] font-Poppins font-thin text-white/60">click anywhere to close</div>
+              </div>
+            </div>
+          )}
 
         </div>
         {/* Peripheral Info - Desktop Only */}
@@ -355,6 +421,8 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
           </div>
         </div>
       </div>
+
+
     </main>
   );
 };
