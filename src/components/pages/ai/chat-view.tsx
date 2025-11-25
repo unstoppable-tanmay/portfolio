@@ -100,6 +100,11 @@ export default function ChatView() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ mode: "chat", messages: [...messages, userMessage] }),
             });
+
+            if (!res.ok) {
+                throw new Error(`API error: ${res.status}`);
+            }
+
             const data = await res.json();
             setMessages((prev) => [...prev, data]);
 
@@ -109,7 +114,7 @@ export default function ChatView() {
             console.error("Error in chat:", error);
             const errorMessage = {
                 role: "assistant",
-                content: "Sorry, I encountered an error. Please try again."
+                content: "Sorry, I encountered an error. Please try again after some time."
             };
             setMessages((prev) => [...prev, errorMessage]);
         } finally {
