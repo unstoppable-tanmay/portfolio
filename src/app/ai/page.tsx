@@ -29,7 +29,7 @@ export default function AiPage() {
                         : "text-white/50"
                         }`}
                 >
-                    Check If I am Eligible
+                    Recruiter&apos;s AI
                 </button>
                 <button
                     onClick={() => setActiveTab("chat")}
