@@ -274,7 +274,7 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
           <div className="flex flex-col gap-2">
             <a
               href={data.social.resume}
-              className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group flex items-center gap-1.5"
+              className="text-[10px] font-light text-black/80 hover:text-black/90 transition-colors pointer-events-auto group flex items-center gap-1.5"
             >
               <span className="group-hover:underline">Resume</span>
               <span className="text-[8px]">↓</span>
@@ -282,21 +282,21 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
             <a
               href={data.social.linkedin}
               target="_blank"
-              className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group"
+              className="text-[10px] font-light text-black/80 hover:text-black/90 transition-colors pointer-events-auto group"
             >
               <span className="group-hover:underline">LinkedIn</span>
             </a>
             <a
               href={data.social.github}
               target="_blank"
-              className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group"
+              className="text-[10px] font-light text-black/80 hover:text-black/90 transition-colors pointer-events-auto group"
             >
               <span className="group-hover:underline">GitHub</span>
             </a>
             <a
               href={data.social.medium}
               target="_blank"
-              className="text-[10px] font-light text-black/70 hover:text-black/90 transition-colors pointer-events-auto group"
+              className="text-[10px] font-light text-black/80 hover:text-black/90 transition-colors pointer-events-auto group"
             >
               <span className="group-hover:underline">Medium</span>
             </a>
@@ -317,7 +317,7 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
             .map((skill, index) => (
               <div
                 key={index}
-                className="text-[10px] hover:translate-z-[10px] cursor-pointer p-3 -m-3 duration-100 font-light text-black/70 text-right"
+                className="text-[10px] hover:translate-z-[10px] cursor-pointer p-3 -m-3 duration-100 font-light text-black/70 text-right hover:text-black/90"
               >
                 {skill.name}
               </div>
@@ -336,14 +336,14 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
             <a
               key={project.id}
               href={`#project-card-${project.id}`}
-              className={`text-[10px] font-light ${index === 0 ? "text-black/70" : "text-black/60"
+              className={`text-[10px] font-light ${index === 0 ? "text-black/80" : "text-black/70"
                 } hover:text-black/80 transition-colors pointer-events-auto group no-underline p-3 -m-3`}
             >
               <span className="group-hover:underline">{project.title}</span>
               <span className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 →
               </span>
-              <div className="text-[8px] text-black/50 mt-0.5 opacity-40 group-hover:opacity-100 transition-opacity">
+              <div className="text-[8px] text-black/60 mt-0.5 opacity-40 group-hover:opacity-100 transition-opacity">
                 {project.stacks?.slice(0, 3).join(", ")}
               </div>
             </a>
@@ -391,7 +391,7 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
                     </div>
                   )}
                   <div key={item.company} className="text-right group">
-                    <div className="text-[9px] font-light text-black/50 pointer-events-none">
+                    <div className="text-[9px] font-light text-black/60 pointer-events-none">
                       {item.period}
                     </div>
                     <a
@@ -405,18 +405,18 @@ const Landing = ({ data }: { data: TANMAY_TYPE }) => {
                         className={`${index === 0 ? "w-[12px]" : "w-[15px]"
                           } aspect-square object-fill`}
                       />
-                      <span className="text-[10px] font-normal text-black/60">
+                      <span className="text-[10px] font-normal text-black/75">
                         {item.company}
                       </span>
                     </a>
-                    <div className="text-[8px] font-light text-black/50 pointer-events-none">
+                    <div className="text-[8px] font-light text-black/60 pointer-events-none">
                       {item.role}
                     </div>
                   </div>
                 </>
               ))}
           </div>
-          <div className="text-[10px] font-light text-black/70 pointer-events-none">
+          <div className="text-[10px] font-light text-black/85 pointer-events-none">
             {data.meta.totalExperience} Of Building Tech
           </div>
         </div>
