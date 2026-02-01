@@ -25,7 +25,8 @@ export default function RootLayout({
       <head>
         <meta name="msapplication-TileColor" content="#00aba9" />
         <meta name="theme-color" content="#000000" />
-        <meta name="google-site-verification" content="C6FQc6M44LTrxZf43lfic7p53w5X_2E4iDsOKekC9D0" />
+        <meta name="google-site-verification" content="C6FQc6M44LTrxZf43lfic7p53w5X_2E4iDsOKekC9D0" /> {/* vercel */}
+        <meta name="google-site-verification" content="VmWAWSml4MFTCFtrVErL-2gJdjv48WOk1tSZY3Pk1kA" /> {/* https://tanmaykumarpanda.in/ */}
       </head>
       <body className={`${inter.className}`}>
         <GlobalLoader />
