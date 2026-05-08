@@ -11,8 +11,26 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Tanmay Kumar",
-  description: "I’m a software engineer and product builder focused on creating scalable, high-performance systems and developer-first tools. I work across modern web technologies, backend architectures, and AI-driven applications, with a strong interest in system design, automation, and building products from zero to production. I enjoy solving hard engineering problems, experimenting with new ideas, and shipping practical solutions that actually get used",
+  metadataBase: new URL("https://tanmaykumarpanda.in"),
+  title: {
+    default: "Tanmay Kumar | Software Engineer",
+    template: "%s | Tanmay Kumar"
+  },
+  description: "I’m a software engineer and product builder focused on creating scalable, high-performance systems and developer-first tools. I work across modern web technologies, backend architectures, and AI-driven applications, with a strong interest in system design, automation, and building products from zero to production. I enjoy solving hard engineering problems, experimenting with new ideas, and shipping practical solutions that actually get used.",
+  openGraph: {
+    title: "Tanmay Kumar | Software Engineer",
+    description: "I’m a software engineer and product builder focused on creating scalable, high-performance systems and developer-first tools.",
+    url: "https://tanmaykumarpanda.in",
+    siteName: "Tanmay Kumar",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tanmay Kumar | Software Engineer",
+    description: "I’m a software engineer and product builder focused on creating scalable, high-performance systems and developer-first tools.",
+    creator: "@tanmaypanda752",
+  },
 };
 
 export default function RootLayout({
